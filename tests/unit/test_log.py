@@ -74,9 +74,7 @@ def test_request_scope_measures_and_reraises(
     assert len(str(failure["request_id"])) == 8
 
 
-def test_configure_is_idempotent(
-    reset_logging: None, capsys: pytest.CaptureFixture[str]
-) -> None:
+def test_configure_is_idempotent(reset_logging: None, capsys: pytest.CaptureFixture[str]) -> None:
     """Повторный вызов не должен множить обработчики — иначе строки задваиваются."""
     configure_logging(level="INFO", fmt="json")
     configure_logging(level="INFO", fmt="json")

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 LogLevel = Literal["DEBUG", "INFO", "WARNING", "ERROR"]
@@ -40,6 +40,16 @@ class Settings(BaseSettings):
 
     summary_max_chars: int = Field(default=200, ge=50, le=1000)
     default_limit: int = Field(default=8, ge=1, le=50)
+
+    @field_validator("log_file", mode="before")
+    @classmethod
+    def _empty_log_file_means_stderr_only(cls, value: object) -> object:
+        """Пустая переменная окружения — это «не задано», а не пустой путь.
+
+        `TVTRACKER_LOG_FILE=` в `.env` — обычный способ выключить файловый лог. Без этой
+        нормализации получается `Path(".")`, и обработчик пытается открыть каталог как файл.
+        """
+        return None if isinstance(value, str) and not value.strip() else value
 
 
 def load_settings() -> Settings:

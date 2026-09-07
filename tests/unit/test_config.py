@@ -41,3 +41,16 @@ def test_env_prefix_is_applied(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_out_of_range_values_are_rejected(field: str, value: Any) -> None:
     with pytest.raises(ValidationError):
         make_settings(**{field: value})
+
+
+def test_empty_log_file_env_var_means_stderr_only(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`TVTRACKER_LOG_FILE=` в `.env` — это «файлового лога нет», а не путь `.`."""
+    monkeypatch.setenv("TVTRACKER_LOG_FILE", "")
+
+    assert make_settings().log_file is None
+
+
+def test_log_file_path_is_kept_when_set(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TVTRACKER_LOG_FILE", "logs/tvtracker.log")
+
+    assert make_settings().log_file == Path("logs/tvtracker.log")

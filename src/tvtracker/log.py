@@ -36,6 +36,7 @@ _context: ContextVar[dict[str, Any] | None] = ContextVar("tvtracker_log_context"
 def _current() -> dict[str, Any]:
     return _context.get() or {}
 
+
 # Поля, которые `logging` кладёт в каждую запись сам. Всё, чего здесь нет, — это `extra`.
 _RESERVED = frozenset(logging.makeLogRecord({}).__dict__) | {"message", "asctime", "taskName"}
 

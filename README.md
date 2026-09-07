@@ -7,7 +7,7 @@ MCP-сервер для сериалов: находит сериал **по о�
 
 ## Статус
 
-Этап 0: каркас проекта. План реализации — [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md),
+Этап 0: каркас проекта. План реализации — [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md),
 дизайн примитивов — [`docs/DESIGN.md`](docs/DESIGN.md).
 
 ## Быстрый старт
