@@ -1,0 +1,47 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.eggs/
+
+# --- Virtual env / uv ---
+.venv/
+venv/
+uv.lock.bak
+
+# --- Tooling caches ---
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.hypothesis/
+
+# --- Secrets & local config ---
+.env
+.env.local
+*.pem
+
+# --- Data: корпус TVmaze и кэш эпизодов в репозиторий не коммитятся ---
+data/
+*.db
+*.db-wal
+*.db-shm
+*.sqlite3
+
+# --- Логи ---
+logs/
+*.log
+
+# --- Артефакты evals ---
+evals/reports/
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
