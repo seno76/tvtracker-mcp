@@ -34,7 +34,6 @@ def test_env_prefix_is_applied(monkeypatch: pytest.MonkeyPatch) -> None:
     [
         ("rate_limit_per_second", 5.0),
         ("http_timeout", 0),
-        ("default_limit", 0),
         ("max_retries", -1),
     ],
 )

@@ -47,14 +47,6 @@ def strip_html(raw: str | None) -> str:
     return _WHITESPACE.sub(" ", unescape("".join(parser.chunks))).strip()
 
 
-def truncate(text: str, limit: int) -> str:
-    """Режет текст по границе слова и ставит многоточие. Пустая строка остаётся пустой."""
-    if len(text) <= limit:
-        return text
-    cut = text[:limit].rsplit(" ", 1)[0].rstrip(" ,.;:—-")
-    return f"{cut}…"
-
-
 def rating_average(value: Any) -> Any:
     """`rating` приходит как `{"average": 7.6}` либо как `{"average": null}`."""
     return value.get("average") if isinstance(value, dict) else value

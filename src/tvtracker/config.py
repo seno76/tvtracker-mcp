@@ -39,7 +39,6 @@ class Settings(BaseSettings):
     log_file: Path | None = None
 
     summary_max_chars: int = Field(default=200, ge=50, le=1000)
-    default_limit: int = Field(default=8, ge=1, le=50)
 
     @field_validator("log_file", mode="before")
     @classmethod

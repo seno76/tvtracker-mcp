@@ -16,8 +16,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 
-from tvtracker.tvmaze.models import truncate
+from tvtracker.domain.backlog import parse_airstamp
 
 # Статусы TVmaze по-русски. Незнакомый статус показываем как есть — молча ронять
 # информацию хуже, чем показать английское слово.
@@ -28,12 +29,50 @@ _STATUS = {
     "In Development": "в разработке",
 }
 
+DAYS_IN_WEEK = 7
+DAYS_IN_MONTH = 30
+
 _TRACKING = {
     "watching": "отслеживаю",
     "paused": "на паузе",
     "finished": "досмотрел",
     "dropped": "брошен",
 }
+
+
+def truncate(text: str, limit: int) -> str:
+    """Режет текст по границе слова и ставит многоточие. Пустая строка остаётся пустой."""
+    if len(text) <= limit:
+        return text
+    cut = text[:limit].rsplit(" ", 1)[0].rstrip(" ,.;:—-")
+    return f"{cut}…"
+
+
+def format_hours(minutes: int) -> str:
+    """`5 ч 45 мин`, `50 мин`. Ноль даёт пустую строку — его не показываем."""
+    if minutes <= 0:
+        return ""
+    hours, rest = divmod(minutes, 60)
+    if hours and rest:
+        return f"{hours} ч {rest} мин"
+    return f"{hours} ч" if hours else f"{rest} мин"
+
+
+def humanize_since(airstamp: str | None, now: datetime) -> str:
+    """«3 дн. назад», «2 нед. назад» — то, как о сроках говорит человек."""
+    aired_at = parse_airstamp(airstamp)
+    if aired_at is None:
+        return ""
+    days = (now - aired_at).days
+    if days <= 0:
+        return "сегодня"
+    if days == 1:
+        return "вчера"
+    if days < DAYS_IN_WEEK:
+        return f"{days} дн. назад"
+    if days < DAYS_IN_MONTH:
+        return f"{days // DAYS_IN_WEEK} нед. назад"
+    return f"{days // DAYS_IN_MONTH} мес. назад"
 
 
 @dataclass(frozen=True)

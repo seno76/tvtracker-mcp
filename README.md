@@ -8,8 +8,9 @@ MCP-сервер для сериалов: находит сериал **по о�
 ## Статус
 
 Работает: 5 инструментов, 5 ресурсов, 4 промпта, корпус на 89 664 сериала.
-План реализации — [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md),
-дизайн примитивов — [`docs/DESIGN.md`](docs/DESIGN.md).
+Архитектура — [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), план реализации —
+[`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md), дизайн примитивов —
+[`docs/DESIGN.md`](docs/DESIGN.md), замеры — [`docs/EVALS.md`](docs/EVALS.md).
 
 | Примитив | Что делает |
 | --- | --- |

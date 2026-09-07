@@ -95,13 +95,6 @@ class Recorder:
         self.calls.append(uri)
         return body
 
-    async def prompt(self, name: str, arguments: dict[str, str]) -> str:
-        result = await self._client.get_prompt(name, arguments)
-        body = str(result.messages[0].content.text)
-        self.chars += len(body)
-        self.calls.append(f"prompt:{name}")
-        return body
-
 
 def load_spec() -> dict[int, dict[str, Any]]:
     """Читает `tasks.yaml`. Прогон обязан покрывать ровно то, что в нём объявлено."""

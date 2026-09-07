@@ -205,11 +205,11 @@ class Repo:
 
     # --- Отметки синхронизации ----------------------------------------------------------
 
-    def get_sync_marker(self, key: str) -> str | None:
+    def _get_marker(self, key: str) -> str | None:
         row = self.conn.execute("SELECT value FROM sync_state WHERE key = ?", (key,)).fetchone()
         return str(row["value"]) if row else None
 
-    def set_sync_marker(self, key: str, value: str) -> None:
+    def _set_marker(self, key: str, value: str) -> None:
         self.conn.execute(
             """
             INSERT INTO sync_state (key, value) VALUES (?, ?)
@@ -220,36 +220,32 @@ class Repo:
 
     @property
     def last_full_sync(self) -> str | None:
-        return self.get_sync_marker(_LAST_FULL_SYNC)
+        return self._get_marker(_LAST_FULL_SYNC)
 
     def mark_full_sync(self) -> None:
-        self.set_sync_marker(_LAST_FULL_SYNC, _now())
+        self._set_marker(_LAST_FULL_SYNC, _now())
 
     @property
     def last_updates_sync(self) -> str | None:
-        return self.get_sync_marker(_LAST_UPDATES_SYNC)
+        return self._get_marker(_LAST_UPDATES_SYNC)
 
     def mark_updates_sync(self) -> None:
-        self.set_sync_marker(_LAST_UPDATES_SYNC, _now())
+        self._set_marker(_LAST_UPDATES_SYNC, _now())
 
     # --- Чтение для инструментов и ресурсов ---------------------------------------------
-
-    def get_show(self, slug: str) -> sqlite3.Row | None:
-        row: sqlite3.Row | None = self.conn.execute(
-            "SELECT * FROM shows WHERE slug = ?", (slug,)
-        ).fetchone()
-        return row
 
     def resolve_show(self, reference: str) -> sqlite3.Row | None:
         """Находит сериал по slug или по названию.
 
-        Модель оперирует человеческими именами, а внутри у нас slug. Точное совпадение
-        имени бьёт частичное, а среди частичных выигрывает более популярный — иначе
-        «The Office» отдаёт малоизвестный ремейк вместо оригинала.
+        Модель оперирует человеческими именами, а внутри у нас slug. Сначала пробуем
+        ключ, потом название: точное совпадение имени бьёт частичное, а среди частичных
+        выигрывает более популярный — иначе «The Office» отдаёт ремейк вместо оригинала.
         """
-        row = self.get_show(reference)
-        if row is not None:
-            return row
+        by_slug: sqlite3.Row | None = self.conn.execute(
+            "SELECT * FROM shows WHERE slug = ?", (reference,)
+        ).fetchone()
+        if by_slug is not None:
+            return by_slug
         found: sqlite3.Row | None = self.conn.execute(
             """
             SELECT * FROM shows

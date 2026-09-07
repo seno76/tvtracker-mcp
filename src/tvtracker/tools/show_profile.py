@@ -15,14 +15,14 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
+from tvtracker.clock import utcnow
 from tvtracker.domain.backlog import episode_minutes, unwatched
 from tvtracker.domain.episodes import EpisodeRef, format_code
 from tvtracker.domain.format import render_show_line
 from tvtracker.domain.verdict import season_profile, trend
 from tvtracker.log import get_logger, request_scope
 from tvtracker.mapping import to_episode_rows, to_show_line
-from tvtracker.tools._common import app
-from tvtracker.utils import utcnow
+from tvtracker.runtime import app_from
 
 logger = get_logger(__name__)
 
@@ -42,7 +42,7 @@ def register(server: MCPServer) -> None:
         Показывает, где сериал раскачивается и где проседает, — этого нет ни в одном
         клиенте TVmaze, хотя оценка каждой серии в API лежит.
         """
-        context = app(ctx)
+        context = app_from(ctx)
         repo = context.repo
 
         with request_scope("show_profile", show=show):

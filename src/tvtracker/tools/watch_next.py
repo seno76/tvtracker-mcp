@@ -16,8 +16,8 @@ from pydantic import Field
 
 from tvtracker.domain.verdict import choose
 from tvtracker.log import get_logger, request_scope
+from tvtracker.runtime import app_from
 from tvtracker.services import collect_backlogs
-from tvtracker.tools._common import app
 
 logger = get_logger(__name__)
 
@@ -42,7 +42,7 @@ def register(server: MCPServer) -> None:
         Предлагает только вышедшие серии из бэклога и только те, что укладываются
         в заданное время.
         """
-        repo = app(ctx).repo
+        repo = app_from(ctx).repo
 
         with request_scope("watch_next", minutes=minutes):
             states = None if include_new else ("watching",)

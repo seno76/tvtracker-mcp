@@ -234,3 +234,64 @@ def test_choose_drops_what_does_not_fit() -> None:
     )
 
     assert choose([long_one], 30, {}, {}) == []
+
+
+# --- Человеческое представление величин ---------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("minutes", "expected"),
+    [(0, ""), (-5, ""), (50, "50 мин"), (60, "1 ч"), (120, "2 ч"), (345, "5 ч 45 мин")],
+)
+def test_format_hours(minutes: int, expected: str) -> None:
+    from tvtracker.domain.format import format_hours
+
+    assert format_hours(minutes) == expected
+
+
+@pytest.mark.parametrize(
+    ("days_ago", "expected"),
+    [(0, "сегодня"), (1, "вчера"), (3, "3 дн. назад"), (11, "1 нед. назад"), (60, "2 мес. назад")],
+)
+def test_humanize_since(days_ago: int, expected: str) -> None:
+    from datetime import UTC, datetime, timedelta
+
+    from tvtracker.domain.format import humanize_since
+
+    now = datetime(2026, 9, 8, 12, 0, tzinfo=UTC)
+    aired = (now - timedelta(days=days_ago)).isoformat()
+
+    assert humanize_since(aired, now) == expected
+
+
+def test_humanize_since_without_a_date_says_nothing() -> None:
+    """Пустая строка лучше выдумки: дату выхода мы не знаем, а не «давно»."""
+    from datetime import UTC, datetime
+
+    from tvtracker.domain.format import humanize_since
+
+    assert humanize_since(None, datetime(2026, 9, 8, tzinfo=UTC)) == ""
+
+
+@pytest.mark.parametrize(
+    ("state", "position", "expected"),
+    [
+        ("watching", "2x03", "отслеживаю, остановился на 2x03"),
+        ("paused", "1x04", "на паузе (1x04)"),
+        ("finished", None, "досмотрел"),
+        ("dropped", "3x01", "брошен (3x01)"),
+        (None, "2x03", ""),
+    ],
+)
+def test_tracking_note(state: str | None, position: str | None, expected: str) -> None:
+    from tvtracker.domain.format import tracking_note
+
+    assert tracking_note(state, position) == expected
+
+
+def test_status_of_an_unknown_code_is_shown_as_is() -> None:
+    """Молча ронять информацию хуже, чем показать английское слово."""
+    from tvtracker.domain.format import status_ru
+
+    assert status_ru("Cancelled") == "Cancelled"
+    assert status_ru(None) == ""

@@ -19,11 +19,11 @@ from mcp.types import ToolAnnotations
 from pydantic import Field
 
 from tvtracker.domain.episodes import EpisodeRef
+from tvtracker.domain.format import truncate
 from tvtracker.index.fts import escape_fts
 from tvtracker.log import get_logger, request_scope
+from tvtracker.runtime import app_from
 from tvtracker.storage.sync import sync_show_episodes
-from tvtracker.tools._common import app
-from tvtracker.tvmaze.models import truncate
 
 logger = get_logger(__name__)
 
@@ -49,7 +49,7 @@ def register(server: MCPServer) -> None:
         Описания серий, до которых ты ещё не дошёл, по умолчанию скрыты — показывается
         только факт, что такая серия есть.
         """
-        context = app(ctx)
+        context = app_from(ctx)
         repo = context.repo
 
         with request_scope("episode_search", scoped=show is not None):

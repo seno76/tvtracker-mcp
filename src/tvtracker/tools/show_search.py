@@ -27,7 +27,7 @@ from tvtracker.index.fts import (
 )
 from tvtracker.log import get_logger, request_scope
 from tvtracker.mapping import decorate
-from tvtracker.tools._common import app
+from tvtracker.runtime import app_from
 
 logger = get_logger(__name__)
 
@@ -71,7 +71,7 @@ def register(server: MCPServer) -> None:
         (`"Science-Fiction"`, не `"Sci-Fi"`). Каждый результат помечен твоим состоянием
         отслеживания.
         """
-        context = app(ctx)
+        context = app_from(ctx)
         repo = context.repo
         filters = SearchFilters(genre, status, language, year_from, year_to, min_rating)
         summary_limit = 400 if response_format == "detailed" else context.settings.summary_max_chars

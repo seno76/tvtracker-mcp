@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from collections.abc import Callable, Iterator
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
@@ -23,13 +23,12 @@ def make_settings(**overrides: Any) -> Settings:
 
 @pytest.fixture
 def anyio_backend() -> str:
-    """Асинхронные тесты гоняем на asyncio (см. документацию anyio по бэкендам)."""
+    """Бэкенд для асинхронных тестов.
+
+    По имени её никто не запрашивает: фикстуру забирает плагин anyio, когда видит
+    маркер. Без неё тесты пошли бы и по trio, которого в зависимостях нет.
+    """
     return "asyncio"
-
-
-@pytest.fixture
-def settings_factory() -> Callable[..., Settings]:
-    return make_settings
 
 
 @pytest.fixture

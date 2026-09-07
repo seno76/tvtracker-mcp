@@ -10,10 +10,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from tvtracker.clock import utcnow
 from tvtracker.domain.backlog import ShowBacklog, build_show_backlog, sort_by_freshness
 from tvtracker.mapping import position_of, to_episode_rows
 from tvtracker.storage.repo import Repo
-from tvtracker.utils import utcnow
 
 
 def collect_backlogs(

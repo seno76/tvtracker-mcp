@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import pytest
 
-from tvtracker.tvmaze.models import Episode, Show, make_slug, strip_html, truncate
+from tvtracker.domain.format import truncate
+from tvtracker.tvmaze.models import Episode, Show, make_slug, strip_html
 
 pytestmark = pytest.mark.unit
 

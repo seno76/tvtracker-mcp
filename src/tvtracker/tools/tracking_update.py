@@ -18,15 +18,15 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
+from tvtracker.clock import utcnow
 from tvtracker.domain.backlog import EpisodeRow, unwatched
 from tvtracker.domain.episodes import EpisodeCodeError, EpisodeRef, parse_code
 from tvtracker.errors import SourceUnavailableError
 from tvtracker.log import get_logger, request_scope
 from tvtracker.mapping import to_episode_rows
+from tvtracker.runtime import app_from
 from tvtracker.storage.repo import transaction
 from tvtracker.storage.sync import sync_show_episodes
-from tvtracker.tools._common import app
-from tvtracker.utils import utcnow
 
 logger = get_logger(__name__)
 
@@ -63,7 +63,7 @@ def register(server: MCPServer) -> None:
         При `action="track"` эпизоды сериала загружаются и индексируются — после этого
         по ним работает поиск и считается бэклог.
         """
-        context = app(ctx)
+        context = app_from(ctx)
         repo = context.repo
 
         with request_scope("tracking_update", action=action):
