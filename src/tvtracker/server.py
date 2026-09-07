@@ -67,7 +67,7 @@ async def lifespan(server: MCPServer) -> AsyncIterator[AppContext]:
 def build_server(settings: Settings | None = None) -> MCPServer:
     """Собирает сервер. Отдельная функция, чтобы тесты поднимали его на своей БД."""
     settings = settings or load_settings()
-    configure_logging(settings.log_level, settings.log_format, settings.log_file)
+    configure_logging(settings.log_level, settings.log_format, settings.log_file, force=False)
 
     server = MCPServer("tvtracker", lifespan=lifespan)
 

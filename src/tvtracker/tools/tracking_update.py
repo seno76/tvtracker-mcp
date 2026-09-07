@@ -81,8 +81,9 @@ def register(server: MCPServer) -> None:
             if action == "rate" and rating is None:
                 raise ToolError('Для action="rate" нужен параметр rating от 1 до 10.')
 
+            source_ok = True
             if action == "track":
-                await _load_episodes(context, repo, row)
+                source_ok = await _load_episodes(context, repo, row)
 
             with transaction(repo.conn):
                 repo.upsert_tracking(
@@ -99,7 +100,7 @@ def register(server: MCPServer) -> None:
             await ctx.notify_resource_updated("tracking://backlog")
             await ctx.notify_resource_updated("tracking://taste")
 
-            return _confirmation(repo, row, action, position, rating)
+            return _confirmation(repo, row, action, position, rating, source_ok)
 
 
 def _parse_position(episode: str | None) -> EpisodeRef | None:
@@ -129,23 +130,32 @@ def _untrack(repo: Any, slug: str, name: str) -> str:
     return f"{name} снят с отслеживания. Эпизоды остались в кэше."
 
 
-async def _load_episodes(context: Any, repo: Any, row: Any) -> None:
+async def _load_episodes(context: Any, repo: Any, row: Any) -> bool:
     """Ленивая загрузка эпизодов — just-in-time retrieval в момент подписки.
 
-    Отказ источника здесь не должен ронять саму подписку: трекинг локальный и обязан
-    работать даже когда TVmaze лежит. Поэтому исключение гасится и остаётся в логе.
+    Отказ источника не должен ронять саму подписку: трекинг локальный и обязан работать,
+    даже когда TVmaze лежит. Поэтому исключение гасится — но наружу уходит признак того,
+    что загрузки не было: сказать «эпизоды подгружаются», когда источник отказал, значит
+    соврать модели, и она будет ждать данных, которые не придут.
     """
     if repo.count_episodes(str(row["slug"])) > 0:
-        return
+        return True
     try:
         stored = await sync_show_episodes(context.client, repo, int(row["tvmaze_id"]))
         logger.info("episodes loaded", extra={"show": row["slug"], "episodes": stored})
     except SourceUnavailableError as exc:
         logger.warning("episode load deferred", extra={"show": row["slug"], "why": str(exc)})
+        return False
+    return True
 
 
 def _confirmation(
-    repo: Any, row: Any, action: str, position: EpisodeRef | None, rating: int | None
+    repo: Any,
+    row: Any,
+    action: str,
+    position: EpisodeRef | None,
+    rating: int | None,
+    source_ok: bool = True,
 ) -> str:
     """Подтверждение плюс следующий шаг: чем закончить, чтобы не спрашивали второй раз."""
     name = str(row["name"])
@@ -161,6 +171,12 @@ def _confirmation(
     head = f"Отмечено: {name}" + (f" {position}." if position else ".")
     episodes = to_episode_rows(repo.episodes_for(slug))
     if not episodes:
+        if not source_ok:
+            return (
+                head + " Список серий подтянуть не удалось: источник временно ограничил "
+                "доступ. Сама подписка сохранена, повтори через ~10 секунд — "
+                'tracking_update(action="track") догрузит серии.'
+            )
         return head + " Эпизоды ещё подгружаются — бэклог обновится через несколько секунд."
 
     ahead = unwatched(episodes, position, utcnow())

@@ -83,12 +83,25 @@ class ConsoleFormatter(logging.Formatter):
         return f"{line} | {extras}" if extras else line
 
 
+_CONFIGURED = "_tvtracker_configured"
+
+
 def configure_logging(
     level: str = "INFO",
     fmt: str = "console",
     log_file: Path | None = None,
+    force: bool = True,
 ) -> None:
-    """Настраивает корневой логгер. Идемпотентна: повторный вызов заменяет обработчики."""
+    """Настраивает корневой логгер. Идемпотентна: повторный вызов заменяет обработчики.
+
+    `force=False` повторяет конвенцию `logging.basicConfig`: уже сделанная настройка
+    выигрывает. Это нужно там, где настройка — побочный эффект импорта: сборка сервера
+    происходит на уровне модуля (иначе `mcp dev` не найдёт объект), и без этого импорт
+    `tvtracker.server` затирал бы уровень, который выставил вызывающий.
+    """
+    root = logging.getLogger()
+    if not force and getattr(root, _CONFIGURED, False):
+        return
     formatter: logging.Formatter = JsonFormatter() if fmt == "json" else ConsoleFormatter()
     context_filter = ContextFilter()
 
@@ -101,13 +114,13 @@ def configure_logging(
         handler.setFormatter(formatter)
         handler.addFilter(context_filter)
 
-    root = logging.getLogger()
     for existing in list(root.handlers):
         root.removeHandler(existing)
         existing.close()
     for handler in handlers:
         root.addHandler(handler)
     root.setLevel(level)
+    root.__dict__[_CONFIGURED] = True
 
     # Транспортный шум SDK и httpx не нужен на INFO — он заглушает наши собственные события.
     logging.getLogger("httpx").setLevel(logging.WARNING)

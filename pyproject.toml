@@ -23,6 +23,8 @@ dev = [
     "respx>=0.22",
     "ruff>=0.8",
     "mypy>=1.13",
+    "pyyaml>=6.0.3",
+    "types-pyyaml>=6.0.12.20260906",
 ]
 
 [build-system]
@@ -55,7 +57,7 @@ exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:", "raise NotImplementedE
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-src = ["src", "tests"]
+src = ["src", "tests", "evals"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "C4", "RUF", "S", "ASYNC", "PT"]
@@ -70,5 +72,5 @@ ignore = [
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "tests"]
+files = ["src", "tests", "evals"]
 warn_unreachable = true

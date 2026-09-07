@@ -82,3 +82,26 @@ def test_configure_is_idempotent(reset_logging: None, capsys: pytest.CaptureFixt
 
     assert len(_lines(capsys)) == 1
     assert len(logging.getLogger().handlers) == 1
+
+
+def test_existing_configuration_wins_when_not_forced(
+    reset_logging: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Импорт модуля не должен затирать уровень, который выставил вызывающий."""
+    configure_logging(level="WARNING", fmt="json")
+    configure_logging(level="DEBUG", fmt="json", force=False)
+
+    get_logger("tvtracker.test").info("должно быть отфильтровано")
+
+    assert _lines(capsys) == []
+
+
+def test_forced_configuration_replaces_the_previous_one(
+    reset_logging: None, capsys: pytest.CaptureFixture[str]
+) -> None:
+    configure_logging(level="WARNING", fmt="json")
+    configure_logging(level="DEBUG", fmt="json")
+
+    get_logger("tvtracker.test").info("видно")
+
+    assert len(_lines(capsys)) == 1

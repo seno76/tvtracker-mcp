@@ -33,6 +33,15 @@ uv run mcp dev src/tvtracker/server.py   # MCP Inspector
 
 Подключение к Claude Code — `uv run mcp install src/tvtracker/server.py`.
 
+## Оценка качества
+
+```bash
+uv run python -m evals.runner    # 12 сценариев, замер вызовов и токенов
+```
+
+Отчёт — `evals/reports/latest.md`, разбор и таблица «было/стало» —
+[`docs/EVALS.md`](docs/EVALS.md).
+
 ## Тесты
 
 ```bash
