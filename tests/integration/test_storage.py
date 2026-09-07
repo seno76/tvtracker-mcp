@@ -70,6 +70,22 @@ def test_slug_collision_gets_suffix(repo: Repo) -> None:
     assert slugs == {"the-office-2005", "the-office-2005-2"}
 
 
+def test_slug_collision_inside_one_batch(repo: Repo) -> None:
+    """Одноимённые сериалы приходят одной страницей каталога — в БД их ещё нет обоих."""
+    with transaction(repo.conn):
+        written = repo.upsert_shows(
+            [
+                show(1, "The Office", "2005-03-24"),
+                show(2, "The Office", "2005-11-01"),
+                show(3, "The Office", "2005-12-01"),
+            ]
+        )
+
+    slugs = {row["slug"] for row in repo.conn.execute("SELECT slug FROM shows")}
+    assert written == 3
+    assert slugs == {"the-office-2005", "the-office-2005-2", "the-office-2005-3"}
+
+
 def test_repeated_sync_keeps_the_same_slug(repo: Repo) -> None:
     """Суффикс не должен нарастать при каждом обходе — иначе ключ сериала «уползает»."""
     for _ in range(3):
