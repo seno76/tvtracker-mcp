@@ -482,6 +482,7 @@ uv run python -m evals.runner    # 12 сценариев, отчёт в evals/re
 
 | Файл | О чём |
 | --- | --- |
+| [`docs/LAYOUT.md`](docs/LAYOUT.md) | что где лежит и зачем — разбор каждого файла и формата |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | дизайн примитивов и обоснование каждого решения |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | карта слоёв, правило зависимостей, что где тестируется |
 | [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) | этапы, система логирования, регрессионный контур |
