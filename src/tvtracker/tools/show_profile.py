@@ -18,7 +18,7 @@ from pydantic import Field
 from tvtracker.clock import utcnow
 from tvtracker.domain.backlog import episode_minutes, unwatched
 from tvtracker.domain.episodes import EpisodeRef, format_code
-from tvtracker.domain.format import render_show_line
+from tvtracker.domain.format import format_hours, plural_episodes, render_show_line
 from tvtracker.domain.verdict import season_profile, trend
 from tvtracker.log import get_logger, request_scope
 from tvtracker.mapping import to_episode_rows, to_show_line
@@ -96,5 +96,5 @@ def _position_block(episodes: list[Any], tracking: Any, show_row: Any) -> str:
         else ""
     )
     return (
-        f"Ты на {where}. Впереди {len(pending)} серий, ~{minutes // 60} ч {minutes % 60} мин.{tail}"
+        f"Ты на {where}. Впереди {plural_episodes(len(pending))}, ~{format_hours(minutes)}.{tail}"
     )

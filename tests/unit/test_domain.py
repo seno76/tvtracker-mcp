@@ -295,3 +295,27 @@ def test_status_of_an_unknown_code_is_shown_as_is() -> None:
 
     assert status_ru("Cancelled") == "Cancelled"
     assert status_ru(None) == ""
+
+
+@pytest.mark.parametrize(
+    ("count", "expected"),
+    [
+        (1, "1 серия"),
+        (2, "2 серии"),
+        (4, "4 серии"),
+        (5, "5 серий"),
+        (11, "11 серий"),
+        (14, "14 серий"),
+        (21, "21 серия"),
+        (22, "22 серии"),
+        (25, "25 серий"),
+        (101, "101 серия"),
+        (111, "111 серий"),
+        (0, "0 серий"),
+    ],
+)
+def test_plural_episodes(count: int, expected: str) -> None:
+    """Этот текст модель пересказывает дословно — «впереди 1 серий» дойдёт до пользователя."""
+    from tvtracker.domain.format import plural_episodes
+
+    assert plural_episodes(count) == expected

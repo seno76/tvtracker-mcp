@@ -29,6 +29,10 @@ _STATUS = {
     "In Development": "в разработке",
 }
 
+# 11–14 — исключение из правила согласования, а не магические числа.
+TEENS_START = 11
+TEENS_END = 14
+
 DAYS_IN_WEEK = 7
 DAYS_IN_MONTH = 30
 
@@ -56,6 +60,24 @@ def format_hours(minutes: int) -> str:
     if hours and rest:
         return f"{hours} ч {rest} мин"
     return f"{hours} ч" if hours else f"{rest} мин"
+
+
+def plural_episodes(count: int) -> str:
+    """«1 серия», «3 серии», «14 серий» — русское согласование по числу.
+
+    Не косметика: этот текст читает модель и пересказывает пользователю. «Впереди
+    1 серий» она воспроизведёт дословно.
+    """
+    tail = count % 100
+    if TEENS_START <= tail <= TEENS_END:
+        return f"{count} серий"
+    match count % 10:
+        case 1:
+            return f"{count} серия"
+        case 2 | 3 | 4:
+            return f"{count} серии"
+        case _:
+            return f"{count} серий"
 
 
 def humanize_since(airstamp: str | None, now: datetime) -> str:
