@@ -46,7 +46,7 @@
 данные без авторизации.
 
 ```bash
-git clone <repo> && cd tvtracker-mcp
+git clone https://github.com/seno76/tvtracker-mcp.git && cd tvtracker-mcp
 uv sync --all-groups
 cp .env.example .env
 
